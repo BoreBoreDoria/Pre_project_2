@@ -1,15 +1,17 @@
 package jm.task.core.jdbc.util;
 
+import jm.task.core.jdbc.model.User;
 import org.hibernate.SessionFactory;
-import org.hibernate.boot.Metadata;
-import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.cfg.Configuration;
+import org.hibernate.cfg.Environment;
 import org.hibernate.service.ServiceRegistry;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Properties;
 
 public class Util {
     // реализуйте настройку соеденения с БД
@@ -18,7 +20,6 @@ public class Util {
     private static final String PASSWORD = "root";
 
     //Hibernate
-    private static StandardServiceRegistry registry;
     private static SessionFactory sessionFactory;
 
     public static Connection connect() {
@@ -40,34 +41,30 @@ public class Util {
     public static SessionFactory getSessionFactory() {
         if (sessionFactory == null) {
             try {
-                // Create registry
-                registry = new StandardServiceRegistryBuilder()
-                        .configure()
-                        .build();
+                Configuration configuration = new Configuration();
+                Properties settings = new Properties();
+                settings.put(Environment.DIALECT, "org.hibernate.dialect.MySQLDialect");
+                settings.put(Environment.URL, "jdbc:mysql://localhost:3306/testbase");
+                settings.put(Environment.DRIVER, "com.mysql.jdbc.Driver");
+                settings.put(Environment.USER, "root");
+                settings.put(Environment.PASS, "root");
+                settings.put(Environment.SHOW_SQL, "true");
+                settings.put(Environment.HBM2DDL_AUTO, "update");
+                configuration.setProperties(settings);
 
-                // Create MetadataSources
-                MetadataSources sources = new MetadataSources(registry);
+                configuration.addAnnotatedClass(User.class);
 
-                // Create Metadata
-                Metadata metadata = sources.getMetadataBuilder().build();
+                ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()
+                        .applySettings(configuration.getProperties()).build();
 
-                // Create SessionFactory
-                sessionFactory = metadata.getSessionFactoryBuilder().build();
+                sessionFactory = configuration.buildSessionFactory(serviceRegistry);
 
             } catch (Exception e) {
                 e.printStackTrace();
-                if (registry != null) {
-                    StandardServiceRegistryBuilder.destroy(registry);
-                }
+
             }
         }
         return sessionFactory;
-    }
-
-    public static void shutdown() {
-        if (registry != null) {
-            StandardServiceRegistryBuilder.destroy(registry);
-        }
     }
 
 }
