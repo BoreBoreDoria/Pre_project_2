@@ -28,7 +28,6 @@ public class User {
         this.age = age;
     }
 
-    @Id
     @Column(name = "id", nullable = false)
     public Long getId() {
         return id;
@@ -92,5 +91,13 @@ public class User {
         return result.hashCode();
     }
 
-
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", age=" + age +
+                '}';
+    }
 }
