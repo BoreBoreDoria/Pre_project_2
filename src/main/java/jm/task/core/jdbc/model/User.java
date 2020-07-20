@@ -6,6 +6,7 @@ import javax.persistence.*;
 @Table(name = "users", schema = "testbase")
 public class User {
     @Id
+    @GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;
 
     @Column
@@ -59,7 +60,7 @@ public class User {
 
     @Basic
     @Column(name = "age", nullable = false)
-    public int getAge() {
+    public Byte getAge() {
         return age;
     }
 
